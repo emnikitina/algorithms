@@ -1,29 +1,29 @@
 #include <iostream>
 #include <string>
-
-int find_pair(char c, std::string line) {
-    int pos = line.find_first_of(')');
-    if (pos == std::string::npos)
-        return i;
-    int res = check_line(line.substr(i + 1, pos));
-    if (res != -1)
-        return i;
-}
+#include <algorithm>
 
 int check_line(std::string line) {
-    int pos = -1;
+    size_t pos;
+    int res = -1;
+    char brackets[6] = {'(', ')', '{', '}', '[', ']'};
 
-    for (int i = 0; i < line.size(); i++) {
+    for (size_t i = 0; i < line.size(); i++) {
         if (line[i] == ')' || line[i] == '}' || line[i] == ']')
             return i;
-        else if (line[i] == '(')
-            pos = find_pair(')', line);
-        else if (line[i] == '{')
-            pos = find_pair('}', line);
-        else if (line[i] == '[')
-            pos = find_pair(']', line);
-        if (pos != -1)
-            return pos;
+        
+        for (int j = 0; j < 6; j += 2) {
+            if (line[i] == brackets[j]) {
+                pos = line.find_first_of(brackets[j + 1]);
+                if (pos == std::string::npos)
+                    return i;
+                else {
+                    res = check_line(line.substr(i + 1, pos - i - 1));
+                    if (res != -1)
+                        return (i + res);
+                    i = pos;
+                }
+            }
+        }
     }
     return -1;
 }
@@ -31,11 +31,18 @@ int check_line(std::string line) {
 int main()
 {
     std::string newline;
+    int res = -1;
 
-    std::cout << "input string:\n";
+    std::cout << "input string(s):\n";
     std::getline(std::cin, newline);
+    res = check_line(newline.c_str());
     while (newline != "") {
-        check_line(newline);
+        res = check_line(newline.c_str());
+        if (res == -1)
+            std::cout << "String is right\n";
+        else
+            std::cout << res + 1 << std::endl;
+        std::getline(std::cin, newline);
     }
     return 0;
 }
